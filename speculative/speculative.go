@@ -23,9 +23,8 @@ func (client *SmartSpeculativeExecutionClient) Get() (int, error) {
 		ctx    context.Context
 		cancel context.CancelFunc
 	)
-	defer cancel()
-
 	ctx, cancel = context.WithTimeout(context.Background(), 150*time.Millisecond)
+	defer cancel()
 	for _, h := range client.Hosts {
 		go client.asyncGet(ctx, h, result)
 	}
@@ -38,7 +37,7 @@ func (client *SmartSpeculativeExecutionClient) Get() (int, error) {
 			return -1, nil
 		}
 		println(resultValue)
-		return resultValue, nil
+		return 1, nil
 	case <-ctx.Done():
 		println("Done")
 		return -1, ctx.Err()
@@ -54,7 +53,7 @@ func (m *SmartSpeculativeExecutionClient) asyncGet(ctx context.Context, host ser
 	go call()
 	select {
 	case <-ctx.Done():
-		print("ended")
+		println("Context has ended")
 	case s := <-thisChan:
 		print("received")
 		channel <- s
